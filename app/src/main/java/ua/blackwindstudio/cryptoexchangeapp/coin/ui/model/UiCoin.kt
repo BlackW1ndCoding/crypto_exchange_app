@@ -1,9 +1,8 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.model
 
 data class UiCoin(
-    val id: Int,
-    val coin: String,
-    val currency: String,
-    val price: Float,
+    val fromSymbol: String,
+    val toSymbol: String,
+    val price: String,
     val imageUrl: String
 )

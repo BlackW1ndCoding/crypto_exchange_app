@@ -26,7 +26,7 @@ class CoinListAdapter:
         }
 
         private fun formExchangePair(coin: UiCoin): String {
-            return "${coin.coin}/${coin.currency}"
+            return "${coin.fromSymbol}/${coin.toSymbol}"
         }
     }
 
@@ -43,7 +43,7 @@ class CoinListAdapter:
 
     object DiffCallback: DiffUtil.ItemCallback<UiCoin>() {
         override fun areItemsTheSame(oldItem: UiCoin, newItem: UiCoin): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.fromSymbol == newItem.fromSymbol
         }
 
         override fun areContentsTheSame(oldItem: UiCoin, newItem: UiCoin): Boolean {
