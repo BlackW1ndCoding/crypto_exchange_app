@@ -10,8 +10,8 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 
 @Dao
 interface CoinDao {
-    @Query("SELECT * FROM full_price_info ORDER BY lastUpdate DESC")
-    fun getPriceList(): Flow<CoinDbModel>
+    @Query("SELECT * FROM full_price_info ORDER BY fromSymbol DESC")
+    fun getPriceList(): Flow<List<CoinDbModel>>
 
     @Query("SELECT * FROM full_price_info WHERE fromSymbol == :symbol")
     suspend fun getPriceBySymbol(symbol: String): CoinDbModel

@@ -1,5 +1,6 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinApiFactory
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 
 class CoinListViewModel: ViewModel() {
@@ -17,12 +18,13 @@ class CoinListViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            CoinRepository.loadNewPricesIntoDB(COIN_LIST_SIZE_LIMIT, DEFAULT_CURRENCY)
+            CoinRepository.loadData(COIN_LIST_SIZE_LIMIT, DEFAULT_CURRENCY)
         }
+
         viewModelScope.launch {
-            CoinRepository.getPriceList().collectLatest {
-                _coinList.update { list ->
-                    list.map { coin ->
+            CoinRepository.getPriceList().collectLatest { list ->
+                _coinList.update {
+                    list.map { coin: CoinDbModel ->
                         UiCoin(
                             fromSymbol = coin.fromSymbol,
                             toSymbol = coin.toSymbol,

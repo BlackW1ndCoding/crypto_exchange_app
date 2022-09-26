@@ -3,7 +3,7 @@ package ua.blackwindstudio.cryptoexchangeapp.coin.data.network
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsExchangeInfoContainerDto
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 
 interface CoinApi {
@@ -16,10 +16,10 @@ interface CoinApi {
 
     @GET("pricemultifull")
     suspend fun getFullPriceListByCurrency(
-        @Query(QUERY_PARAM_API_KEY) apiKey: String = "",
+//        @Query(QUERY_PARAM_API_KEY) apiKey: String = "",
         @Query(QUERY_PARAM_FROM_SYMBOL) fSyms: String,
         @Query(QUERY_PARAM_TO_SYMBOLS) tSyms: String = DEFAULT_CURRENCY
-    ): Response<CoinsExchangeInfoContainerDto>
+    ): Response<CoinsInfoContainerDto>
 
     companion object {
         private const val QUERY_PARAM_API_KEY = "api_key"

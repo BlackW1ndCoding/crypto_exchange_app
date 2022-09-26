@@ -6,17 +6,17 @@ data class CoinInfoDto(
     @SerializedName("FROMSYMBOL")
     val fromSymbol: String,
     @SerializedName("TOSYMBOL")
-    val toSymbol: String,
+    val toSymbol: String?,
     @SerializedName("PRICE")
-    val price: String,
+    val price: String?,
     @SerializedName("LASTUPDATE")
-    val lastUpdate: String,
+    val lastUpdate: String?,
     @SerializedName("HIGHDAY")
-    val highDay: String,
+    val highDay: String?,
     @SerializedName("LOWDAY")
-    val lowDay: String,
+    val lowDay: String?,
     @SerializedName("LASTMARKET")
-    val lastMarket: String,
+    val lastMarket: String?,
     @SerializedName("IMAGEURL")
-    val imageUrl: String
+    val imageUrl: String?
 )

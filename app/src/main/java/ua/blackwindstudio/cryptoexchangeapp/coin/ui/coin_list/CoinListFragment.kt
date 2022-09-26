@@ -1,6 +1,7 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,8 +25,9 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         binding = FragmentCoinListBinding.bind(view)
         setupRecycler()
 
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.coinList.collectLatest {
+                Log.d("VIEWMODEL_DEBUG","Updating in fragment")
                 updateRecyclerList(it)
             }
         }
