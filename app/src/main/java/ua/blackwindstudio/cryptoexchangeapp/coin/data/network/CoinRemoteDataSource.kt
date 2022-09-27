@@ -7,8 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
 import java.io.IOException
@@ -29,6 +27,7 @@ class CoinRemoteDataSource {
                 )
                 delay(delay)
             }
+
         }
     }
 

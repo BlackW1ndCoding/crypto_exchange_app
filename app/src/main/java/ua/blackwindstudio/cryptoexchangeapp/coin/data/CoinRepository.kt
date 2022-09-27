@@ -1,6 +1,7 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data
 
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -23,14 +24,26 @@ object CoinRepository {
     private var fromSymbols: CoinFromSymbolsDbModel? = null
     private var toSymbol: String? = null
 
-    suspend fun initializeRepository(limit: Int, toSymbol: String) {
-        val fromSymbolsDto = remote.fetchTopCoins(limit)
+    suspend fun initializeRepository(
+        limit: Int,
+        toSymbol: String,
+        lifecycleScope: LifecycleCoroutineScope
+    ) {
+        if (this.toSymbol == null) this.toSymbol = toSymbol
+        if (fromSymbols == null) {
+            val fromSymbolsDto = remote.fetchTopCoins(limit)
 
-        fromSymbols = CoinFromSymbolsDbModel(
-            mapper.convertTopCoinsInfoDtoToString(fromSymbolsDto)
-        )
-        val flow = remote.getCoinPriceUpdates(fromSymbols!!.fromSymbols, toSymbol, 10000L)
-        flow.collectLatest { dto ->
+            fromSymbols = CoinFromSymbolsDbModel(
+                mapper.convertTopCoinsInfoDtoToString(fromSymbolsDto)
+            )
+        }
+    }
+
+    suspend fun updatePriceList() {
+        Log.d("FLOW_DEBUG", "Starting update")
+        val flow = remote.getCoinPriceUpdates(fromSymbols!!.fromSymbols, toSymbol ?: "USD", 10000L)
+        flow.cancellable().collectLatest { dto ->
+            Log.d("FLOW_DEBUG", "Collecting")
             val coinInfoList =
                 mapper.mapExchangeInfoToListCoinInfo(dto)
 
@@ -60,30 +73,32 @@ object CoinRepository {
         toSymbol = newToSymbol
     }
 
-    private suspend fun loadData() {
+    suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            try {
-                val coinFromSymbols = fromSymbols
-                val coinsInfoContainer = remote.fetchFullCoinsPriceInfo(
-                    coinFromSymbols?.fromSymbols
-                        ?: throw Exception("fromSymbols not yet initialized"),
-                    toSymbol ?: throw Exception("toSymbol not yet initialized")
-                )
-                val coinInfoList =
-                    mapper.mapExchangeInfoToListCoinInfo(coinsInfoContainer)
-
-                db.insertPriceList(coinInfoList.map {
-                    mapper.mapDtoToDb(
-                        it
+            while (true) {
+                try {
+                    val coinFromSymbols = fromSymbols
+                    val coinsInfoContainer = remote.fetchFullCoinsPriceInfo(
+                        coinFromSymbols?.fromSymbols
+                            ?: throw Exception("fromSymbols not yet initialized"),
+                        toSymbol ?: throw Exception("toSymbol not yet initialized")
                     )
-                })
-            } catch (e: Exception) {
-                Log.d(
-                    "Exception",
-                    "Exception while loading price list: ${e.message.toString()}"
-                )
+                    val coinInfoList =
+                        mapper.mapExchangeInfoToListCoinInfo(coinsInfoContainer)
+
+                    db.insertPriceList(coinInfoList.map {
+                        mapper.mapDtoToDb(
+                            it
+                        )
+                    })
+                } catch (e: Exception) {
+                    Log.d(
+                        "Exception",
+                        "Exception while loading price list: ${e.message.toString()}"
+                    )
+                }
+                delay(DATA_LOAD_DELAY)
             }
-            delay(DATA_LOAD_DELAY)
         }
     }
 
