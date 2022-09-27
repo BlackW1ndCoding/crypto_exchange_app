@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinInfoDto
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
 
 class CoinMapper {
@@ -38,6 +39,12 @@ class CoinMapper {
         }
 
         return result
+    }
+
+    fun convertTopCoinsInfoDtoToString(coinNamesListDto: CoinNamesListDto): String {
+        return coinNamesListDto.names.joinToString(",") { fullData ->
+            fullData.coinName?.name ?: "ERROR"
+        }
     }
 
     companion object {

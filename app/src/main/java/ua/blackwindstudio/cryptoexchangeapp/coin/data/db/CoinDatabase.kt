@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinFromSymbolsDbModel
 
 @Database(
-    entities = [CoinDbModel::class],
+    entities = [CoinDbModel::class, CoinFromSymbolsDbModel::class],
     version = 1,
     exportSchema = false
 )
