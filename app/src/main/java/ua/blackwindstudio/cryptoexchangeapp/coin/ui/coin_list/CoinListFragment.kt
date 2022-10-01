@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.collectLatest
 import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_details.CoinDetailsFragment
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.AutoClearedValue
 import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinListBinding
@@ -61,8 +62,19 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private fun setupRecycler() {
         binding.recyclerCoinList.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = CoinListAdapter()
+            adapter = CoinListAdapter(
+                CoinListAdapter.CoinClickListener { coin ->
+                    navigateToDetailFragment(coin)
+                }
+            )
         }
+    }
+
+    private fun navigateToDetailFragment(coin: UiCoin) {
+        parentFragmentManager.beginTransaction().replace(
+            R.id.fragment_root,
+            CoinDetailsFragment.getInstance(coin)
+        ).addToBackStack("detail").commit()
     }
 
     private fun updateRecyclerList(list: List<UiCoin>) {

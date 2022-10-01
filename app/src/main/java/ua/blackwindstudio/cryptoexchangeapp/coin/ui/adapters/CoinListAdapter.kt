@@ -16,7 +16,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.databinding.ItemCoinBinding
 import java.time.format.DateTimeFormatter
 
-class CoinListAdapter:
+class CoinListAdapter(private val coinClickListener: CoinClickListener):
     ListAdapter<UiCoin, CoinListAdapter.CoinListViewHolder>(DiffCallback) {
 
     inner class CoinListViewHolder(private val binding: ItemCoinBinding):
@@ -32,6 +32,7 @@ class CoinListAdapter:
                 Glide.with(binding.root)
                     .load(coin.imageUrl)
                     .into(coinImage)
+                root.setOnClickListener { coinClickListener.click(coin) }
             }
         }
 
@@ -81,4 +82,11 @@ class CoinListAdapter:
             "#ERROR"
         }
     }
+
+    class CoinClickListener(private val onClick: (UiCoin) -> Unit) {
+        fun click(coin: UiCoin) {
+            onClick(coin)
+        }
+    }
 }
+

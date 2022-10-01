@@ -58,8 +58,8 @@ object CoinRepository {
 
     fun getPriceList() = db.getPriceList().mapLatest { list -> list.sortedBy { it.fromSymbol } }
 
-    suspend fun getCoinBySymbol(fromSymbol: String, toSymbol: String) =
-        db.getPriceBySymbols(fromSymbol, toSymbol)
+    suspend fun getCoinBySymbol(fromSymbol: String) =
+        db.getPriceBySymbols(fromSymbol)
 
     suspend fun loadFromSymbols(limit: Int) {
         val topCoinsList = remote.fetchTopCoins(limit)

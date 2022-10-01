@@ -2,6 +2,7 @@
     <string name="app_name">CryptoExchangeApp</string>
     <string name="date_time_pattern">dd.MM hh:mm:ss</string>
     <string name="updated_at">Updated at: %s</string>
+    <string name="from_to">%s/%s</string>
     <string-array name="to_symbols">
         <item>USD</item>
         <item>EUR</item>
