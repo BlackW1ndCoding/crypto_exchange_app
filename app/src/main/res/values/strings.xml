@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">CryptoExchangeApp</string>
+    <string name="date_time_pattern">dd.MM hh:mm:ss</string>
+    <string name="updated_at">Updated at: %s</string>
+    <string-array name="to_symbols">
+        <item>USD</item>
+        <item>EUR</item>
+        <item>UAH</item>
+    </string-array>
 </resources>
