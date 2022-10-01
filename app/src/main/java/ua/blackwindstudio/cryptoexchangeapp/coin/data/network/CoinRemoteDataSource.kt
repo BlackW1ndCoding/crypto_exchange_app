@@ -19,30 +19,29 @@ class CoinRemoteDataSource {
         toSymbol: String,
         delay: Long
     ): Flow<CoinsInfoContainerDto> = flow {
-        withContext(Dispatchers.IO) {
-            while (true) {
-                fetchFullCoinsPriceInfo(
-                    fromSymbols,
-                    toSymbol
-                )
-                delay(delay)
-            }
-
+        while (true) {
+            val info = fetchFullCoinsPriceInfo(
+                fromSymbols,
+                toSymbol
+            )
+            emit(info)
+            delay(delay)
         }
     }
-
 
     suspend fun fetchFullCoinsPriceInfo(
         fromSymbols: String,
         toSymbol: String
     ): CoinsInfoContainerDto {
-        val response =
-            coinApi.getFullPriceListByCurrency(fSyms = fromSymbols, tSyms = toSymbol)
-        return if (response.isSuccessful) {
-            response.body() ?: throw IOException("Response body doesn't exist!!")
-        } else {
-            Log.d("API_DEBUG", "Response Fail")
-            CoinsInfoContainerDto(JsonObject())
+        return withContext(Dispatchers.IO) {
+            val response =
+                coinApi.getFullPriceListByCurrency(fSyms = fromSymbols, tSyms = toSymbol)
+            if (response.isSuccessful) {
+                response.body() ?: throw IOException("Response body doesn't exist!!")
+            } else {
+                Log.d("API_DEBUG", "Response Fail")
+                CoinsInfoContainerDto(JsonObject())
+            }
         }
     }
 

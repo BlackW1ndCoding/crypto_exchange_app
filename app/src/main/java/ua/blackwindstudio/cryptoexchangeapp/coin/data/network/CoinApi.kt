@@ -16,7 +16,7 @@ interface CoinApi {
 
     @GET("pricemultifull")
     suspend fun getFullPriceListByCurrency(
-//        @Query(QUERY_PARAM_API_KEY) apiKey: String = "",
+        @Query(QUERY_PARAM_API_KEY) apiKey: String = "",
         @Query(QUERY_PARAM_FROM_SYMBOL) fSyms: String,
         @Query(QUERY_PARAM_TO_SYMBOLS) tSyms: String = DEFAULT_CURRENCY
     ): Response<CoinsInfoContainerDto>

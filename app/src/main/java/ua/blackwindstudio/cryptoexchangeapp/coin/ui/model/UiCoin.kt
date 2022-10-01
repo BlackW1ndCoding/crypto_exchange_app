@@ -4,5 +4,6 @@ data class UiCoin(
     val fromSymbol: String,
     val toSymbol: String,
     val price: String,
-    val imageUrl: String
+    val updated: String,
+    val imageUrl: String,
 )

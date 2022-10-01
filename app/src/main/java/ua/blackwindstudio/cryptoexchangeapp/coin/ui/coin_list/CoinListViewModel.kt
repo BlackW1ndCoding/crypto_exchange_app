@@ -1,6 +1,5 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +19,7 @@ class CoinListViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            CoinRepository.loadData()
+            CoinRepository.updatePriceList(COIN_LIST_SIZE_LIMIT, "USD")
         }
 
         viewModelScope.launch {
@@ -31,7 +30,8 @@ class CoinListViewModel: ViewModel() {
                             fromSymbol = coin.fromSymbol,
                             toSymbol = coin.toSymbol,
                             price = coin.price,
-                            imageUrl = coin.imageUrl
+                            imageUrl = coin.imageUrl,
+                            updated = coin.lastUpdate
                         )
                     }
                 }

@@ -1,11 +1,12 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data
 
 import android.util.Log
-import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import ua.blackwindstudio.cryptoexchangeapp.App
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
@@ -24,10 +25,9 @@ object CoinRepository {
     private var fromSymbols: CoinFromSymbolsDbModel? = null
     private var toSymbol: String? = null
 
-    suspend fun initializeRepository(
+    private suspend fun initializeRepository(
         limit: Int,
-        toSymbol: String,
-        lifecycleScope: LifecycleCoroutineScope
+        toSymbol: String
     ) {
         if (this.toSymbol == null) this.toSymbol = toSymbol
         if (fromSymbols == null) {
@@ -39,7 +39,8 @@ object CoinRepository {
         }
     }
 
-    suspend fun updatePriceList() {
+    suspend fun updatePriceList(limit: Int, toSymbol: String) {
+        initializeRepository(limit, toSymbol)
         Log.d("FLOW_DEBUG", "Starting update")
         val flow = remote.getCoinPriceUpdates(fromSymbols!!.fromSymbols, toSymbol ?: "USD", 10000L)
         flow.cancellable().collectLatest { dto ->
