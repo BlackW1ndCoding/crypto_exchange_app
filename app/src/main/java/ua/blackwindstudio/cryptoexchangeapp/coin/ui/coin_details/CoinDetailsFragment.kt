@@ -38,11 +38,18 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
 
     private fun bindCoinInformation(coin: UiCoin) {
         binding.apply {
-            textFromTo.text = String.format(
-                getString(R.string.from_to),
-                coin.fromSymbol, coin.toSymbol
+            textFromTo.text =
+                getString(
+                    R.string.from_to,
+                    coin.fromSymbol, coin.toSymbol
+                )
+            textPrice.text = getString(R.string.price, coin.price)
+            textDailyMin.text = getString(R.string.daily_min, coin.dailyMin)
+            textDailyMax.text = getString(R.string.daily_max, coin.dailyMax)
+            textLastMarket.text = getString(R.string.last_market, coin.lastMarket)
+            textUpdatedAt.text = getString(R.string.updated_at, coin.updated).takeLast(
+                STRING_TIME_REPRESENTATION_LENGTH
             )
-            textPrice.text = String.format("Price: %s", coin.price)
             Glide.with(requireContext())
                 .load(coin.imageUrl)
                 .into(coinImage)
@@ -51,6 +58,7 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
 
     companion object {
         const val COIN_ARGUMENT = "COIN_ARGUMENT"
+        const val STRING_TIME_REPRESENTATION_LENGTH = 8
 
         fun getInstance(coin: UiCoin): CoinDetailsFragment {
             return CoinDetailsFragment().apply {

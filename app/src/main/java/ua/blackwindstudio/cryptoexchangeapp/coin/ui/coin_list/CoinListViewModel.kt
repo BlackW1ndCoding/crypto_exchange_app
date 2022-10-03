@@ -8,14 +8,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ua.blackwindstudio.cryptoexchangeapp.App
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.mappers.Mapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CoinListViewModel: ViewModel() {
     private val _coinList = MutableStateFlow<List<UiCoin>>(emptyList())
     val coinList: StateFlow<List<UiCoin>> = _coinList
+    private val mapper = Mapper(App.INSTANCE!!.applicationContext)
 
     init {
         viewModelScope.launch {
@@ -25,14 +28,8 @@ class CoinListViewModel: ViewModel() {
         viewModelScope.launch {
             CoinRepository.getPriceList().collectLatest { list ->
                 _coinList.update {
-                    list.map { coin: CoinDbModel ->
-                        UiCoin(
-                            fromSymbol = coin.fromSymbol,
-                            toSymbol = coin.toSymbol,
-                            price = coin.price,
-                            imageUrl = coin.imageUrl,
-                            updated = coin.lastUpdate
-                        )
+                    list.map { dbModel: CoinDbModel ->
+                        mapper.mapDbModelToUiCoin(dbModel)
                     }
                 }
             }

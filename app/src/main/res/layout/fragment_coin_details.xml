@@ -3,14 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingHorizontal="15dp">
 
     <ImageView
         android:id="@+id/coin_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="25dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
@@ -19,20 +20,64 @@
         android:id="@+id/text_from_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/coin_image"
-        app:layout_constraintTop_toTopOf="@+id/coin_image"
+        app:layout_constraintEnd_toEndOf="@+id/coin_image"
+        app:layout_constraintStart_toStartOf="@+id/coin_image"
+        app:layout_constraintTop_toBottomOf="@+id/coin_image"
         tools:text="BTC/USD" />
 
-    <TextView
-        android:id="@+id/text_price"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:textSize="22sp"
-        app:layout_constraintStart_toEndOf="@id/coin_image"
-        app:layout_constraintTop_toBottomOf="@id/text_from_to"
-        tools:text="Price: 20.0021" />
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/text_from_to">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_price"
+                style="@style/CoinDetailsBodyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Price: 20.0021" />
+
+            <TextView
+                android:id="@+id/text_daily_min"
+                style="@style/CoinDetailsBodyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/red"
+                tools:text="Day Minimum: 23.0011" />
+
+            <TextView
+                android:id="@+id/text_daily_max"
+                style="@style/CoinDetailsBodyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/green"
+                tools:text="Day Maximum: 23.0011" />
+
+            <TextView
+                android:id="@+id/text_last_market"
+                style="@style/CoinDetailsBodyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                tools:text="Last Market: Binance" />
+
+            <TextView
+                android:id="@+id/text_updated_at"
+                style="@style/CoinDetailsBodyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                tools:text="Updated at: 18:14:05" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

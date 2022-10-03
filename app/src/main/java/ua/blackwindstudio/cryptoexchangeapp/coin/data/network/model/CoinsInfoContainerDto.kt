@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 
 data class CoinsInfoContainerDto(
     @SerializedName("RAW")
-    val rawData: JsonObject
+    val rawData: JsonObject?
 )
