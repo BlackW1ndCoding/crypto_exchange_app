@@ -1,6 +1,7 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
@@ -30,23 +32,33 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.coinList.collectLatest { list ->
                 updateRecyclerList(list)
-                //smells like shit spirit
-                if (list.isNotEmpty() &&
-                    binding.detailFragmentContainer != null
-                    && binding.detailFragmentContainer!!.childCount == 0
+            }
+        }
+        if (binding.detailFragmentContainer != null
+            && binding.detailFragmentContainer!!.childCount == 0
+        ) {
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.coinList.collectLatest { list ->
+                    Log.d("FLOW_DEBUG", "Collecting list:empty is ${list.isEmpty()}")
+                    if (list.isNotEmpty()) {
+                        initializeLandscapeMode(list.first())
+                        cancel()
+                    }
 
-                ) {
-                    initializeLandscapeMode(list.first())
                 }
             }
+
         }
     }
 
     private fun initializeLandscapeMode(coin: UiCoin) {
-        childFragmentManager.beginTransaction().add(
-            R.id.detail_fragment_container,
-            CoinDetailsFragment.getInstance(coin)
-        ).addToBackStack("detail").commit()
+        with(childFragmentManager) {
+            popBackStack()
+            beginTransaction().replace(
+                R.id.detail_fragment_container,
+                CoinDetailsFragment.getInstance(coin)
+            ).commit()
+        }
     }
 
     private fun setupSpinner() {
@@ -94,7 +106,7 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
             childFragmentManager.beginTransaction().replace(
                 R.id.detail_fragment_container,
                 CoinDetailsFragment.getInstance(coin)
-            ).addToBackStack("detail").commit()
+            ).commit()
         }
     }
 

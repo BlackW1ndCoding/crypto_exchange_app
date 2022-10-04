@@ -32,7 +32,8 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback {
-            parentFragmentManager.popBackStack()
+            parentFragmentManager
+                .popBackStack()
         }
     }
 
