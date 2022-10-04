@@ -11,6 +11,7 @@ import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.autoCleared
 import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinDetailsBinding
+import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinListBinding
 
 class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
     private var binding by autoCleared<FragmentCoinDetailsBinding>()
@@ -46,9 +47,7 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
             textDailyMin.text = getString(R.string.daily_min, coin.dailyMin)
             textDailyMax.text = getString(R.string.daily_max, coin.dailyMax)
             textLastMarket.text = getString(R.string.last_market, coin.lastMarket)
-            textUpdatedAt.text = getString(R.string.updated_at, coin.updated).takeLast(
-                STRING_TIME_REPRESENTATION_LENGTH
-            )
+            textUpdatedAt.text = getString(R.string.updated_at, coin.updated)
             Glide.with(requireContext())
                 .load(coin.imageUrl)
                 .into(coinImage)
@@ -57,7 +56,6 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
 
     companion object {
         const val COIN_ARGUMENT = "COIN_ARGUMENT"
-        const val STRING_TIME_REPRESENTATION_LENGTH = 8
 
         fun getInstance(coin: UiCoin): CoinDetailsFragment {
             return CoinDetailsFragment().apply {

@@ -1,7 +1,6 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -29,11 +28,25 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         setupSpinner()
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.coinList.collectLatest {
-                Log.d("VIEWMODEL_DEBUG", "Updating in fragment")
-                updateRecyclerList(it)
+            viewModel.coinList.collectLatest { list ->
+                updateRecyclerList(list)
+                //smells like shit spirit
+                if (list.isNotEmpty() &&
+                    binding.detailFragmentContainer != null
+                    && binding.detailFragmentContainer!!.childCount == 0
+
+                ) {
+                    initializeLandscapeMode(list.first())
+                }
             }
         }
+    }
+
+    private fun initializeLandscapeMode(coin: UiCoin) {
+        childFragmentManager.beginTransaction().add(
+            R.id.detail_fragment_container,
+            CoinDetailsFragment.getInstance(coin)
+        ).addToBackStack("detail").commit()
     }
 
     private fun setupSpinner() {
@@ -67,14 +80,22 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
                     navigateToDetailFragment(coin)
                 }
             )
+            itemAnimator = null
         }
     }
 
     private fun navigateToDetailFragment(coin: UiCoin) {
-        parentFragmentManager.beginTransaction().replace(
-            R.id.fragment_root,
-            CoinDetailsFragment.getInstance(coin)
-        ).addToBackStack("detail").commit()
+        if (binding.detailFragmentContainer == null) {
+            parentFragmentManager.beginTransaction().replace(
+                R.id.fragment_root,
+                CoinDetailsFragment.getInstance(coin)
+            ).addToBackStack("detail").commit()
+        } else {
+            childFragmentManager.beginTransaction().replace(
+                R.id.detail_fragment_container,
+                CoinDetailsFragment.getInstance(coin)
+            ).addToBackStack("detail").commit()
+        }
     }
 
     private fun updateRecyclerList(list: List<UiCoin>) {
