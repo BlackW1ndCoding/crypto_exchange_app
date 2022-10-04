@@ -31,9 +31,10 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
             }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback {
-            parentFragmentManager
-                .popBackStack()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (parentFragmentManager.backStackEntryCount != 0) {
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 
