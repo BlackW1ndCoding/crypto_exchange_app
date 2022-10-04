@@ -16,7 +16,6 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
     private var binding by autoCleared<FragmentCoinDetailsBinding>()
     private lateinit var viewModel: CoinDetailsViewModel
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val args =

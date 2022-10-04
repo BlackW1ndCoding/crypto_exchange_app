@@ -15,7 +15,7 @@ interface CoinDao {
     fun getPriceList(): Flow<List<CoinDbModel>>
 
     @Query("SELECT * FROM full_price_info WHERE fromSymbol == :fromSymbol")
-    suspend fun getPriceBySymbols(fromSymbol: String): CoinDbModel
+    fun getPriceBySymbols(fromSymbol: String): Flow<CoinDbModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPriceList(list: List<CoinDbModel>)

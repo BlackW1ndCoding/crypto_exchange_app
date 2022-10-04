@@ -50,7 +50,7 @@ object CoinRepository {
 
     fun getPriceList() = db.getPriceList().mapLatest { list -> list.sortedBy { it.fromSymbol } }
 
-    suspend fun getCoinBySymbol(fromSymbol: String) =
+    fun getCoinBySymbol(fromSymbol: String) =
         db.getPriceBySymbols(fromSymbol)
 
     suspend fun loadFromSymbols(limit: Int) {
@@ -65,35 +65,6 @@ object CoinRepository {
     fun changeToSymbol(newToSymbol: String) {
         toSymbol = newToSymbol
     }
-
-//    suspend fun loadData() {
-//        withContext(Dispatchers.IO) {
-//            while (true) {
-//                try {
-//                    val coinFromSymbols = fromSymbols
-//                    val coinsInfoContainer = remote.fetchFullCoinsPriceInfo(
-//                        coinFromSymbols?.fromSymbols
-//                            ?: throw Exception("fromSymbols not yet initialized"),
-//                        toSymbol ?: throw Exception("toSymbol not yet initialized")
-//                    )
-//                    val coinInfoList =
-//                        mapper.mapExchangeInfoToListCoinInfo(coinsInfoContainer)
-//
-//                    db.insertPriceList(coinInfoList.map {
-//                        mapper.mapDtoToDb(
-//                            it
-//                        )
-//                    })
-//                } catch (e: Exception) {
-//                    Log.d(
-//                        "Exception",
-//                        "Exception while loading price list: ${e.message.toString()}"
-//                    )
-//                }
-//                delay(DATA_LOAD_DELAY)
-//            }
-//        }
-//    }
 
     private const val DATA_LOAD_DELAY = 10000L
 }

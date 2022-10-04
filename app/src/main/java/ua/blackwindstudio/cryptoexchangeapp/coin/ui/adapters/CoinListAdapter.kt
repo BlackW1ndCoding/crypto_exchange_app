@@ -31,10 +31,10 @@ class CoinListAdapter(private val coinClickListener: CoinClickListener):
                 )
                 textPrice.text = formatPrice(coin.price)
 
-                Glide.with(binding.root)
+                Glide.with(context)
                     .load(coin.imageUrl)
                     .into(coinImage)
-                root.setOnClickListener { coinClickListener.click(coin) }
+                root.setOnClickListener { coinClickListener(coin) }
             }
         }
     }
@@ -61,7 +61,7 @@ class CoinListAdapter(private val coinClickListener: CoinClickListener):
     }
 
     class CoinClickListener(private val onClick: (UiCoin) -> Unit) {
-        fun click(coin: UiCoin) {
+        operator fun invoke(coin: UiCoin) {
             onClick(coin)
         }
     }
