@@ -1,12 +1,10 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +30,6 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.coinList.collectLatest { list ->
-                Log.d("FLOW_DEBUG", "Collecting first list:empty is ${list.isEmpty()}")
                 updateRecyclerList(list)
             }
         }
@@ -40,9 +37,7 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
             && binding.detailFragmentContainer!!.childCount == 0
         ) {
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                Log.d("FLOW_DEBUG", "launching collecting")
                 viewModel.coinList.collectLatest { list ->
-                    Log.d("FLOW_DEBUG", "Collecting second list:empty is ${list.isEmpty()}")
                     if (list.isNotEmpty()) {
                         initializeLandscapeMode(list.first())
                         cancel()
@@ -53,12 +48,12 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     }
 
     private fun initializeLandscapeMode(coin: UiCoin) {
-        with(childFragmentManager) {
+        with(parentFragmentManager) {
             popBackStack()
             beginTransaction().replace(
                 R.id.detail_fragment_container,
                 CoinDetailsFragment.getInstance(coin)
-            ).addToBackStack(null).commit()
+            ).commit()
         }
     }
 
@@ -98,33 +93,21 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     }
 
     private fun navigateToDetailFragment(coin: UiCoin) {
-        //TODO deal with backStack
         if (inPortraitMode()) {
-            logBackStack(parentFragmentManager, "entry")
             parentFragmentManager.beginTransaction().replace(
                 R.id.fragment_root,
                 CoinDetailsFragment.getInstance(coin)
             ).addToBackStack(null).commit()
-            logBackStack(parentFragmentManager, "out")
         } else {
-            logBackStack(childFragmentManager, "entry")
-            childFragmentManager.popBackStack()
-            childFragmentManager.beginTransaction().replace(
+            parentFragmentManager.popBackStack()
+            parentFragmentManager.beginTransaction().replace(
                 R.id.detail_fragment_container,
                 CoinDetailsFragment.getInstance(coin)
-            ).addToBackStack(null).commit()
-            logBackStack(childFragmentManager, "out")
+            ).commit()
         }
     }
 
-    private fun logBackStack(manager: FragmentManager, m: String) {
-        Log.d(
-            "BACKSTACK_DEBUG",
-            "$m ${manager.backStackEntryCount}"
-        )
-    }
-
-    private fun inPortraitMode() = binding.detailFragmentContainer == null
+    private fun inPortraitMode() = requireContext().resources.getBoolean(R.bool.isPortrait)
 
     private fun updateRecyclerList(list: List<UiCoin>) {
         (binding.recyclerCoinList.adapter as CoinListAdapter).submitList(list)

@@ -11,7 +11,6 @@ import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.autoCleared
 import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinDetailsBinding
-import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinListBinding
 
 class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
     private var binding by autoCleared<FragmentCoinDetailsBinding>()
@@ -30,10 +29,14 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
                 bindCoinInformation(coin)
             }
         }
+        val inPortraitMode = requireContext().resources.getBoolean(R.bool.isPortrait)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (parentFragmentManager.backStackEntryCount != 0) {
+            if (inPortraitMode) {
                 parentFragmentManager.popBackStack()
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressed()
             }
         }
     }
