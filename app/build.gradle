@@ -53,6 +53,8 @@ dependencies {
 
     //date-time
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    //workers
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

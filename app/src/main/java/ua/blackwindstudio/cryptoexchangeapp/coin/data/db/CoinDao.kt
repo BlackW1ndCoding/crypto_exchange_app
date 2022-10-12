@@ -21,7 +21,7 @@ interface CoinDao {
     suspend fun insertPriceList(list: List<CoinDbModel>)
 
     @Query("SELECT * FROM from_symbols LIMIT 1")
-    fun getFromSymbols(): Flow<CoinFromSymbolsDbModel>
+    fun getFromSymbols(): CoinFromSymbolsDbModel
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFromSymbols(fromSymbols: CoinFromSymbolsDbModel)

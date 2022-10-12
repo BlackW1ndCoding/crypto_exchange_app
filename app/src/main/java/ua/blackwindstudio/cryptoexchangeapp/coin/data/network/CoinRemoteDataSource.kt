@@ -1,9 +1,6 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data.network
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
@@ -11,22 +8,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoCon
 class CoinRemoteDataSource {
     private val coinApi = CoinApiFactory.apiService
 
-    fun getCoinPriceUpdates(
-        fromSymbols: String,
-        toSymbol: String,
-        delay: Long
-    ): Flow<CoinsInfoContainerDto> = flow {
-        while (true) {
-            val info = fetchFullCoinsPriceInfo(
-                fromSymbols,
-                toSymbol
-            )
-            emit(info)
-            delay(delay)
-        }
-    }
-
-    private suspend fun fetchFullCoinsPriceInfo(
+    suspend fun fetchFullCoinsPriceInfo(
         fromSymbols: String,
         toSymbol: String
     ): CoinsInfoContainerDto {
@@ -34,9 +16,9 @@ class CoinRemoteDataSource {
             val response =
                 coinApi.getFullPriceListByCurrency(fSyms = fromSymbols, tSyms = toSymbol)
             if (response.isSuccessful) {
-                response.body() ?: CoinsInfoContainerDto(null)
+                response.body() ?: throw Exception("Response has empty body")
             } else {
-                CoinsInfoContainerDto(null)
+                throw Exception("Could not fetch coin price info")
             }
         }
     }
