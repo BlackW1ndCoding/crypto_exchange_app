@@ -10,6 +10,7 @@
         android:id="@+id/fragment_root"
         android:name="ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list.CoinListFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_coin_list" />
 
 </FrameLayout>

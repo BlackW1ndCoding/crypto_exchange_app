@@ -18,10 +18,15 @@ class CoinMapper {
             highDay = dto.highDay ?: "",
             lowDay = dto.lowDay ?: "",
             lastMarket = dto.lastMarket ?: "",
-            imageUrl = BASE_IMAGE_URL + dto.imageUrl
+            imageUrl = if (dto.imageUrl.isNullOrBlank()) {
+                ""
+            } else {
+                BASE_IMAGE_URL + dto.imageUrl
+            }
         )
 
     fun mapExchangeInfoToListCoinInfo(json: CoinsInfoContainerDto): List<CoinInfoDto> {
+        require(json.rawData != null) { "CoinsInfoContainerDto rawData must not be null." }
         val result = mutableListOf<CoinInfoDto>()
         val jsonObject = json.rawData
         val keys = jsonObject.keySet()
@@ -37,11 +42,11 @@ class CoinMapper {
                 result.add(priceInfo)
             }
         }
-
         return result
     }
 
     fun convertTopCoinsInfoDtoToString(coinNamesListDto: CoinNamesListDto): String {
+        require(coinNamesListDto.names != null) { "coinNamesListDto.names must not be null." }
         return coinNamesListDto.names.joinToString(",") { fullData ->
             fullData.coinName?.name ?: "ERROR"
         }

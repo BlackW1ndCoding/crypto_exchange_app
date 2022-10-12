@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class CoinNamesListDto(
     @SerializedName("Data")
-    val names: List<CoinNameContainerDto>
+    val names: List<CoinNameContainerDto>?
 )
