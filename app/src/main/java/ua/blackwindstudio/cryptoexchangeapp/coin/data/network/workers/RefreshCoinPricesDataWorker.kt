@@ -1,6 +1,6 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers
 
-import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.work.*
 import kotlinx.coroutines.delay
@@ -10,8 +10,8 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinRemoteDataSource
 
 class RefreshCoinPricesDataWorker(
-    context: Application,
-    private val params: WorkerParameters
+    context: Context,
+    params: WorkerParameters
 ): CoroutineWorker(context, params) {
 
     private val remote = CoinRemoteDataSource()
@@ -22,8 +22,9 @@ class RefreshCoinPricesDataWorker(
     private val mapper = CoinMapper()
 
     override suspend fun doWork(): Result {
-        //TODO finish workers transition
-        val toSymbol = params.inputData.getString(TO_SYMBOL_PARAM) ?: return Result.failure()
+        val toSymbol = inputData.getString(TO_SYMBOL_PARAM) ?: return Result.failure()
+        val delay = inputData.getLong(DATA_LOAD_DELAY_PARAM, DATA_LOAD_DELAY_PARAM_DEFAULT)
+
         while (true) {
             try {
                 val fromSymbolsDb = db.getFromSymbols()
@@ -44,24 +45,26 @@ class RefreshCoinPricesDataWorker(
                     "Could not update prices data with ${e.message}"
                 )
             }
-            delay(10000L)
+            delay(delay)
         }
     }
 
     companion object {
         const val NAME = "RefreshDataWorker"
+        const val DATA_LOAD_DELAY_PARAM = "DATA_LOAD_DELAY_PARAM"
+        const val DATA_LOAD_DELAY_PARAM_DEFAULT = 10000L
         const val TO_SYMBOL_PARAM = "TO_SYMBOL_PARAM"
 
         fun makeRequest(
-            toSymbol: String
+            toSymbol: String,
+            delay: Long
         ): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<RefreshCoinPricesDataWorker>()
                 .setInputData(
-                    Data.Builder()
-                        .putString(
-                            TO_SYMBOL_PARAM,
-                            toSymbol
-                        ).build()
+                    workDataOf(
+                        TO_SYMBOL_PARAM to toSymbol,
+                        DATA_LOAD_DELAY_PARAM to delay
+                    )
                 ).build()
         }
     }

@@ -1,56 +1,48 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data
 
-import androidx.work.*
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import ua.blackwindstudio.cryptoexchangeapp.App
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinFromSymbolsDbModel
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinRemoteDataSource
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshCoinPricesDataWorker
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshTopCoinsListWorker
 
 @ExperimentalCoroutinesApi
 object CoinRepository {
-    private val mapper = CoinMapper()
-    private val remote = CoinRemoteDataSource()
-    private val db = CoinDatabase.instance(
-        App.INSTANCE?.applicationContext
-            ?: throw RuntimeException("Application not yet initialized")
-    ).dao
+    val context = App.INSTANCE ?: throw RuntimeException("Application not yet initialized")
+    private val db = CoinDatabase.instance(context).dao
 
-    fun updatePriceList(limit: Int, toSymbol: String) {
-        initializeRepository(limit, toSymbol)
+    fun updatePriceList(toSymbol: String) {
+        initializeRepository(toSymbol)
     }
 
     private fun initializeRepository(
-        limit: Int,
         toSymbol: String
     ) {
-        val workManager = WorkManager.getInstance(
-            App.INSTANCE?.applicationContext
-                ?: throw RuntimeException("Application not yet initialized")
-        )
-        queueRefreshCoinPricesWork(toSymbol, workManager)
+        val workManager = WorkManager.getInstance(context)
         queueRefreshTopCoinsList(workManager)
+        queueRefreshCoinPricesWork(toSymbol, workManager)
     }
 
     private fun queueRefreshTopCoinsList(workManager: WorkManager) {
         workManager.enqueueUniquePeriodicWork(
             RefreshTopCoinsListWorker.NAME,
             ExistingPeriodicWorkPolicy.KEEP,
-            RefreshTopCoinsListWorker.makeRequest()
+            RefreshTopCoinsListWorker.makeRequest(DATA_LOAD_LIMIT)
         )
     }
 
-    private fun queueRefreshCoinPricesWork(toSymbol: String, workManager: WorkManager) {
+    private fun queueRefreshCoinPricesWork(
+        toSymbol: String,
+        workManager: WorkManager
+    ) {
         workManager.enqueueUniqueWork(
             RefreshCoinPricesDataWorker.NAME,
             ExistingWorkPolicy.REPLACE,
-            RefreshCoinPricesDataWorker.makeRequest(toSymbol)
+            RefreshCoinPricesDataWorker.makeRequest(toSymbol, DATA_LOAD_DELAY)
         )
     }
 
@@ -60,12 +52,10 @@ object CoinRepository {
         db.getPriceBySymbols(fromSymbol)
 
     fun changeToSymbol(toSymbol: String) {
-        val workManager = WorkManager.getInstance(
-            App.INSTANCE?.applicationContext
-                ?: throw RuntimeException("Application not yet initialized")
-        )
+        val workManager = WorkManager.getInstance(context)
         queueRefreshCoinPricesWork(toSymbol, workManager)
     }
 
     private const val DATA_LOAD_DELAY = 10000L
+    private const val DATA_LOAD_LIMIT = 50
 }

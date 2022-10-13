@@ -22,7 +22,7 @@ class CoinListViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            CoinRepository.updatePriceList(COIN_LIST_SIZE_LIMIT, "USD")
+            CoinRepository.updatePriceList("USD")
         }
 
         viewModelScope.launch {
