@@ -6,8 +6,9 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinInfoDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
+import javax.inject.Inject
 
-class CoinMapper {
+class CoinMapper @Inject constructor() {
 
     fun mapDtoToDb(dto: CoinInfoDto): CoinDbModel =
         CoinDbModel(

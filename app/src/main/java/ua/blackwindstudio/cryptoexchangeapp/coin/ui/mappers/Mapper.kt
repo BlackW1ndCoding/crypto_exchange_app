@@ -4,8 +4,9 @@ import android.content.Context
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.formatDate
+import javax.inject.Inject
 
-class Mapper(private val context: Context) {
+class Mapper @Inject constructor(private val context: Context) {
     fun mapDbModelToUiCoin(dbModel: CoinDbModel): UiCoin =
         UiCoin(
             fromSymbol = dbModel.fromSymbol,

@@ -4,9 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinNamesListDto
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.model.CoinsInfoContainerDto
+import javax.inject.Inject
 
-class CoinRemoteDataSource {
-    private val coinApi = CoinApiFactory.apiService
+class CoinRemoteDataSource @Inject constructor(private val coinApi: CoinApi) {
 
     suspend fun fetchFullCoinsPriceInfo(
         fromSymbols: String,

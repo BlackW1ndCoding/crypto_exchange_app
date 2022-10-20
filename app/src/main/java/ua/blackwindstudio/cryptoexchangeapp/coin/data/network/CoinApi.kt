@@ -22,6 +22,8 @@ interface CoinApi {
     ): Response<CoinsInfoContainerDto>
 
     companion object {
+        const val BASE_URL = "https://min-api.cryptocompare.com/data/"
+
         private const val QUERY_PARAM_API_KEY = "api_key"
         private const val QUERY_PARAM_LIMIT = "limit"
         private const val QUERY_PARAM_FROM_SYMBOL = "fsyms"

@@ -5,11 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.cryptoexchangeapp.App
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.mappers.Mapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 
@@ -32,9 +29,9 @@ class CoinDetailsViewModel(private val fromSymbol: String): ViewModel() {
 
     init {
         viewModelScope.launch {
-            CoinRepository.getCoinBySymbol(fromSymbol).collectLatest { dbModel ->
-                _coin.update { mapper.mapDbModelToUiCoin(dbModel) }
-            }
+//            CoinRepository.getCoinBySymbol(fromSymbol).collectLatest { dbModel ->
+//                _coin.update { mapper.mapDbModelToUiCoin(dbModel) }
+//            }
         }
     }
 }
