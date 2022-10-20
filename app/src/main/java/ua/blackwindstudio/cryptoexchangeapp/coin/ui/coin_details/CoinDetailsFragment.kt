@@ -25,9 +25,9 @@ class CoinDetailsFragment: Fragment(R.layout.fragment_coin_details) {
         binding = FragmentCoinDetailsBinding.bind(view)
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.coin.collectLatest { coin ->
-                bindCoinInformation(coin)
-            }
+//            viewModel.coin.collectLatest { coin ->
+//                bindCoinInformation(coin)
+//            }
         }
         val inPortraitMode = requireContext().resources.getBoolean(R.bool.isPortrait)
 

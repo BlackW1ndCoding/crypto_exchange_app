@@ -6,27 +6,37 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import ua.blackwindstudio.cryptoexchangeapp.R
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.ResourceProvider
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.formatPrice
 import ua.blackwindstudio.cryptoexchangeapp.databinding.ItemCoinBinding
+import javax.inject.Inject
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.ERROR_STRING_TEMPLATE
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.FROM_TO_STRING_NAME
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.UPDATED_AT_STRING_NAME
 
-class CoinListAdapter(private val coinClickListener: CoinClickListener):
+class CoinListAdapter @Inject constructor(
+    private val resourceProvider: ResourceProvider
+):
     ListAdapter<UiCoin, CoinListAdapter.CoinListViewHolder>(DiffCallback) {
+
+    var coinClickListener: CoinClickListener? = null
 
     inner class CoinListViewHolder(private val binding: ItemCoinBinding):
         RecyclerView.ViewHolder(binding.root) {
         fun bind(coin: UiCoin) {
+            val strings = resourceProvider.stringsMap
+
             binding.apply {
                 val context = binding.root.context
 
-                textExchangePair.text = context.getString(
-                    R.string.from_to,
+                textExchangePair.text = String.format(
+                    strings[FROM_TO_STRING_NAME] ?: ERROR_STRING_TEMPLATE,
                     coin.fromSymbol,
                     coin.toSymbol
                 )
                 textUpdatedAt.text = String.format(
-                    context.getString(R.string.updated_at),
+                    strings[UPDATED_AT_STRING_NAME] ?: ERROR_STRING_TEMPLATE,
                     coin.updated
                 )
                 textPrice.text = formatPrice(coin.price)
@@ -34,7 +44,7 @@ class CoinListAdapter(private val coinClickListener: CoinClickListener):
                 Glide.with(context)
                     .load(coin.imageUrl)
                     .into(coinImage)
-                root.setOnClickListener { coinClickListener(coin) }
+                root.setOnClickListener { coinClickListener?.invoke(coin) }
             }
         }
     }

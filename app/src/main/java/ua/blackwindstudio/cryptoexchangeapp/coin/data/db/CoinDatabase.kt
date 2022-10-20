@@ -11,9 +11,6 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinFromSymbolsDb
     exportSchema = false
 )
 abstract class CoinDatabase: RoomDatabase() {
-
-    lateinit var INSTANCE: CoinDatabase
-
     abstract val dao: CoinDao
 
     companion object {

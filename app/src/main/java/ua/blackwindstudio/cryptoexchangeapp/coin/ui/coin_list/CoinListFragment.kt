@@ -25,6 +25,9 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private var binding by AutoClearedValue<FragmentCoinListBinding>(this)
 
     @Inject
+    lateinit var coinListAdapter: CoinListAdapter
+
+    @Inject
     lateinit var viewModelFactory: CoinListViewModelFactory
     private val viewModel by viewModels<CoinListViewModel> {
         viewModelFactory
@@ -97,13 +100,14 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private fun setupRecycler() {
         binding.recyclerCoinList.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = CoinListAdapter(
-                CoinListAdapter.CoinClickListener { coin ->
+            adapter = coinListAdapter.apply {
+                coinClickListener = CoinListAdapter.CoinClickListener { coin ->
                     navigateToDetailFragment(coin)
                 }
-            )
+            }
             itemAnimator = null
         }
+
     }
 
     private fun navigateToDetailFragment(coin: UiCoin) {

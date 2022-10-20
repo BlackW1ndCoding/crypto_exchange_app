@@ -8,10 +8,9 @@ import kotlinx.coroutines.flow.mapLatest
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshCoinPricesDataWorker
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshTopCoinsListWorker
-import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-class CoinRepositoryImpl @Inject constructor(
+class CoinRepositoryImpl (
     private val db: CoinDatabase,
     private val workManager: WorkManager
 ): CoinRepository {

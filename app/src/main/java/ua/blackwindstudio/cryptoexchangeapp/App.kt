@@ -18,7 +18,6 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        INSTANCE = this
 
         appComponent = DaggerAppComponent.builder()
             .context(this)
@@ -30,11 +29,6 @@ class App: Application() {
             .setWorkerFactory(baseWorkerFactory)
             .build()
         WorkManager.initialize(this, workManagerConfig)
-    }
-
-    companion object {
-        @Volatile
-        var INSTANCE: Application? = null
     }
 }
 

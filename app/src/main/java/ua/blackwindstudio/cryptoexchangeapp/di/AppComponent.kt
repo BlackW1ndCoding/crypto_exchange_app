@@ -7,13 +7,15 @@ import ua.blackwindstudio.cryptoexchangeapp.App
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDBModule
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list.CoinListFragment
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import javax.inject.Singleton
 
 @Component(
     modules = [
         RepositoryModule::class,
         CoinDBModule::class,
-        NetworkModule::class
+        NetworkModule::class,
+        UIModule::class
     ]
 )
 @Singleton

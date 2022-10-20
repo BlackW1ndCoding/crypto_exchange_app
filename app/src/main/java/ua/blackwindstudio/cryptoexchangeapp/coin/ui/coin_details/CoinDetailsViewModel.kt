@@ -12,20 +12,20 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CoinDetailsViewModel(private val fromSymbol: String): ViewModel() {
-    private val mapper = Mapper(App.INSTANCE!!.applicationContext)
-    private val _coin = MutableStateFlow(
-        UiCoin(
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""
-        )
-    )
-    val coin: StateFlow<UiCoin> = _coin
+//    private val mapper = Mapper(App.INSTANCE!!.applicationContext)
+//    private val _coin = MutableStateFlow(
+//        UiCoin(
+//            "",
+//            "",
+//            "",
+//            "",
+//            "",
+//            "",
+//            "",
+//            ""
+//        )
+//    )
+//    val coin: StateFlow<UiCoin> = _coin
 
     init {
         viewModelScope.launch {
