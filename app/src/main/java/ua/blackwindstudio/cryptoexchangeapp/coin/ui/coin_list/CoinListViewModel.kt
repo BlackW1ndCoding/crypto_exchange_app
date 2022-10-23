@@ -3,6 +3,7 @@ package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -13,7 +14,10 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.mappers.Mapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 
-class CoinListViewModel(private val repository: CoinRepository, private val mapper: Mapper):
+class CoinListViewModel @AssistedInject constructor(
+    private val repository: CoinRepository,
+    private val mapper: Mapper
+):
     ViewModel() {
     private val _coinList = MutableStateFlow<List<UiCoin>>(emptyList())
     val coinList: StateFlow<List<UiCoin>> = _coinList
@@ -25,7 +29,7 @@ class CoinListViewModel(private val repository: CoinRepository, private val mapp
 
         viewModelScope.launch {
             repository.getPriceList().collectLatest { list ->
-                Log.d("REPOSITORY","Collecting in VM")
+                Log.d("REPOSITORY", "Collecting in VM")
                 _coinList.update {
                     list.map { dbModel: CoinDbModel ->
                         mapper.mapDbModelToUiCoin(dbModel)

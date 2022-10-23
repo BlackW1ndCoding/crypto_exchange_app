@@ -63,7 +63,6 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         }
     }
 
-
     private fun initializeLandscapeMode(coin: UiCoin) {
         with(parentFragmentManager) {
             popBackStack()
@@ -130,4 +129,5 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private fun updateRecyclerList(list: List<UiCoin>) {
         (binding.recyclerCoinList.adapter as CoinListAdapter).submitList(list)
     }
+
 }
