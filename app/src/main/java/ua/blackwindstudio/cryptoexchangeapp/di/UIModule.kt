@@ -9,23 +9,21 @@ import javax.inject.Singleton
 
 @Module
 class UIModule {
-
     @Provides
     @Singleton
-    fun provideResourceProvider(context: Context): ResourceProvider {
-        return object: ResourceProvider {
-            override val stringsMap: Map<String, String> = listOf(
-                R.string.from_to,
-                R.string.updated_at,
-                R.string.date_time_pattern
-            ).associate {
-                context.resources.getResourceName(it)
-                    .removePrefix(RESOURCE_NAME_PREFIX) to context.getString(it)
-            }
+    fun provideResourceProvider(context: Context): ResourceProvider<String> {
+        val stringIds = intArrayOf(
+            R.string.from_to,
+            R.string.updated_at,
+            R.string.date_time_pattern
+        )
+        return object: ResourceProvider<String> {
+            override val resourcesMap =
+                ResourceProvider.mapResources(
+                    context.resources,
+                    context.resources::getString,
+                    *stringIds
+                )
         }
-    }
-
-    companion object {
-        private const val RESOURCE_NAME_PREFIX = "ua.blackwindstudio.cryptoexchangeapp:string/"
     }
 }
