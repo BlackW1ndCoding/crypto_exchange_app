@@ -16,7 +16,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.FROM_TO_STRING_NAME
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.UPDATED_AT_STRING_NAME
 
 class CoinListAdapter @Inject constructor(
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider<String>
 ):
     ListAdapter<UiCoin, CoinListAdapter.CoinListViewHolder>(DiffCallback) {
 
@@ -25,7 +25,7 @@ class CoinListAdapter @Inject constructor(
     inner class CoinListViewHolder(private val binding: ItemCoinBinding):
         RecyclerView.ViewHolder(binding.root) {
         fun bind(coin: UiCoin) {
-            val strings = resourceProvider.stringsMap
+            val strings = resourceProvider.resourcesMap
 
             binding.apply {
                 val context = binding.root.context

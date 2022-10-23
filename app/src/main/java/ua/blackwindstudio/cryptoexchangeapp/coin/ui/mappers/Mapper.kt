@@ -7,7 +7,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.DATE_TIME_STRING_NAME
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.formatDate
 import javax.inject.Inject
 
-class Mapper @Inject constructor(private val resourceProvider: ResourceProvider) {
+class Mapper @Inject constructor(private val resourceProvider: ResourceProvider<String>) {
     fun mapDbModelToUiCoin(dbModel: CoinDbModel): UiCoin =
         UiCoin(
             fromSymbol = dbModel.fromSymbol,
@@ -18,7 +18,7 @@ class Mapper @Inject constructor(private val resourceProvider: ResourceProvider)
             lastMarket = dbModel.lastMarket,
             updated = formatDate(
                 dbModel.lastUpdate,
-                resourceProvider.stringsMap[DATE_TIME_STRING_NAME] ?: DEFAULT_DATE_TIME_PATTERN
+                resourceProvider.resourcesMap[DATE_TIME_STRING_NAME] ?: DEFAULT_DATE_TIME_PATTERN
             ),
             imageUrl = dbModel.imageUrl
         )
