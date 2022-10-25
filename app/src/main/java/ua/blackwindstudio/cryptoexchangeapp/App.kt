@@ -30,6 +30,8 @@ class App: Application() {
             .build()
         WorkManager.initialize(this, workManagerConfig)
     }
+
+
 }
 
 val Context.appComponent: AppComponent

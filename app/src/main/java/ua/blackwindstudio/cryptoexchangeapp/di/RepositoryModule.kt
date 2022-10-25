@@ -1,20 +1,17 @@
 package ua.blackwindstudio.cryptoexchangeapp.di
 
-import androidx.work.WorkManager
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepositoryImpl
-import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import javax.inject.Singleton
 
 @Module
-class RepositoryModule {
+interface RepositoryModule {
     @OptIn(ExperimentalCoroutinesApi::class)
-    @Provides
+    @Binds
     @Singleton
-    fun provideCoinRepository(db: CoinDatabase, manager: WorkManager): CoinRepository =
-        CoinRepositoryImpl(db, manager)
+    fun bindCoinRepository(impl: CoinRepositoryImpl): CoinRepository
 }
 

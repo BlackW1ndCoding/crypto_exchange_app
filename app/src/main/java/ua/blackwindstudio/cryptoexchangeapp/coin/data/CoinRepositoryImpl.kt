@@ -1,29 +1,38 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data
 
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinPriceUpdateService
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshCoinPricesDataWorker
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshTopCoinsListWorker
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-class CoinRepositoryImpl (
+class CoinRepositoryImpl @Inject constructor(
     private val db: CoinDatabase,
+    private val priceLoadService: CoinPriceUpdateService,
     private val workManager: WorkManager
 ): CoinRepository {
 
-    override fun updatePriceList(toSymbol: String) {
-        initializeRepository(toSymbol)
+    override suspend fun updatePriceList(toSymbol: String, loadDelay: Long) {
+        initializeRepository(toSymbol, loadDelay)
     }
 
-    private fun initializeRepository(
-        toSymbol: String
+
+    private suspend fun initializeRepository(
+        toSymbol: String,
+        loadDelay: Long
     ) {
         queueRefreshTopCoinsList()
-        queueRefreshCoinPricesWork(toSymbol)
+        stopBackGroundPriceUpdate()
+        startPriceLoadingService(toSymbol, loadDelay)
+    }
+
+    private suspend fun startPriceLoadingService(toSymbol: String, loadDelay: Long) {
+        priceLoadService.startCoinPriceLoading(toSymbol, loadDelay)
     }
 
     private fun queueRefreshTopCoinsList() {
@@ -37,11 +46,15 @@ class CoinRepositoryImpl (
     private fun queueRefreshCoinPricesWork(
         toSymbol: String
     ) {
-        workManager.enqueueUniqueWork(
+        workManager.enqueueUniquePeriodicWork(
             RefreshCoinPricesDataWorker.NAME,
-            ExistingWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.REPLACE,
             RefreshCoinPricesDataWorker.makeRequest(toSymbol, DATA_LOAD_DELAY)
         )
+    }
+
+    private fun stopBackGroundPriceUpdate() {
+        workManager.cancelUniqueWork(RefreshCoinPricesDataWorker.NAME)
     }
 
     override fun getPriceList() =
@@ -50,8 +63,14 @@ class CoinRepositoryImpl (
     override fun getCoinBySymbol(fromSymbol: String) =
         db.dao.getPriceBySymbols(fromSymbol)
 
-    override fun changeToSymbol(toSymbol: String) {
-        queueRefreshCoinPricesWork(toSymbol)
+    override suspend fun changeToSymbol(toSymbol: String) {
+        startPriceLoadingService(toSymbol, DATA_LOAD_DELAY)
+    }
+
+    override fun onAppDestroy() {
+        queueRefreshCoinPricesWork(toSymbol = "USD")
+        priceLoadService.cancelCoinPriceLoading()
+
     }
 
     companion object {

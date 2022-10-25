@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinRemoteDataSource
+import java.time.Duration
 
 class RefreshCoinPricesDataWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -61,8 +62,8 @@ class RefreshCoinPricesDataWorker @AssistedInject constructor(
         fun makeRequest(
             toSymbol: String,
             delay: Long
-        ): OneTimeWorkRequest {
-            return OneTimeWorkRequestBuilder<RefreshCoinPricesDataWorker>()
+        ): PeriodicWorkRequest {
+            return PeriodicWorkRequestBuilder<RefreshCoinPricesDataWorker>(Duration.ofMinutes(5))
                 .setInputData(
                     workDataOf(
                         TO_SYMBOL_PARAM to toSymbol,

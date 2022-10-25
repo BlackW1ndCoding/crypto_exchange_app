@@ -24,7 +24,7 @@ class CoinListViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            repository.updatePriceList("USD")
+            repository.updatePriceList("USD", 10000L)
         }
 
         viewModelScope.launch {
@@ -40,7 +40,9 @@ class CoinListViewModel @AssistedInject constructor(
     }
 
     fun changeToSymbol(position: Int) {
-        repository.changeToSymbol(ToSymbol.values()[position].name)
+        viewModelScope.launch {
+            repository.changeToSymbol(ToSymbol.values()[position].name)
+        }
     }
 
     enum class ToSymbol {
