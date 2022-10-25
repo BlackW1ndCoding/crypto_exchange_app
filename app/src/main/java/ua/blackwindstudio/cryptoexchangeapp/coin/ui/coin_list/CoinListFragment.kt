@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +35,11 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     }
 
     override fun onAttach(context: Context) {
+
+        requireActivity().installSplashScreen().setKeepOnScreenCondition {
+            viewModel.isLoading
+        }
+
         context.appComponent.inject(this)
         super.onAttach(context)
     }
