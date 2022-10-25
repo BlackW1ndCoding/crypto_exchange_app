@@ -1,6 +1,5 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.AssistedInject
@@ -22,6 +21,9 @@ class CoinListViewModel @AssistedInject constructor(
     private val _coinList = MutableStateFlow<List<UiCoin>>(emptyList())
     val coinList: StateFlow<List<UiCoin>> = _coinList
 
+    var isLoading = true
+        private set
+
     init {
         viewModelScope.launch {
             repository.updatePriceList("USD")
@@ -29,7 +31,8 @@ class CoinListViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             repository.getPriceList().collectLatest { list ->
-                Log.d("REPOSITORY", "Collecting in VM")
+                if (list.isNotEmpty()) isLoading = false
+
                 _coinList.update {
                     list.map { dbModel: CoinDbModel ->
                         mapper.mapDbModelToUiCoin(dbModel)
