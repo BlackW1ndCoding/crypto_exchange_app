@@ -3,23 +3,21 @@ package ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
-import ua.blackwindstudio.cryptoexchangeapp.App
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinRemoteDataSource
 
-class RefreshCoinPricesDataWorker(
-    context: Context,
-    params: WorkerParameters
+class RefreshCoinPricesDataWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val db: CoinDatabase,
+    private val remote: CoinRemoteDataSource,
+    private val mapper: CoinMapper
 ): CoroutineWorker(context, params) {
-
-    private val remote = CoinRemoteDataSource()
-    private val db = CoinDatabase.instance(
-        App.INSTANCE?.applicationContext
-            ?: throw RuntimeException("Application not yet initialized")
-    ).dao
-    private val mapper = CoinMapper()
 
     override suspend fun doWork(): Result {
         val toSymbol = inputData.getString(TO_SYMBOL_PARAM) ?: return Result.failure()
@@ -27,14 +25,14 @@ class RefreshCoinPricesDataWorker(
 
         while (true) {
             try {
-                val fromSymbolsDb = db.getFromSymbols()
+                val fromSymbolsDb = db.dao.getFromSymbols()
                 val response =
                     remote.fetchFullCoinsPriceInfo(
                         fromSymbols = fromSymbolsDb.fromSymbols,
                         toSymbol = toSymbol
                     )
 
-                db.insertPriceList(
+                db.dao.insertPriceList(
                     mapper.mapExchangeInfoToListCoinInfo(
                         response
                     ).map { mapper.mapDtoToDb(it) }
@@ -47,6 +45,11 @@ class RefreshCoinPricesDataWorker(
             }
             delay(delay)
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(context: Context, params: WorkerParameters): RefreshCoinPricesDataWorker
     }
 
     companion object {

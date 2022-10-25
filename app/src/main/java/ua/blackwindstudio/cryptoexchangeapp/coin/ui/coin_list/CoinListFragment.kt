@@ -1,5 +1,6 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -11,16 +12,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import ua.blackwindstudio.cryptoexchangeapp.R
+import ua.blackwindstudio.cryptoexchangeapp.appComponent
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_details.CoinDetailsFragment
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.AutoClearedValue
 import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinListBinding
+import javax.inject.Inject
 
 class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
 
     private var binding by AutoClearedValue<FragmentCoinListBinding>(this)
-    private val viewModel by viewModels<CoinListViewModel>()
+
+    @Inject
+    lateinit var coinListAdapter: CoinListAdapter
+
+    @Inject
+    lateinit var viewModelFactory: CoinListViewModelFactory
+    private val viewModel by viewModels<CoinListViewModel> {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -83,13 +99,14 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private fun setupRecycler() {
         binding.recyclerCoinList.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = CoinListAdapter(
-                CoinListAdapter.CoinClickListener { coin ->
+            adapter = coinListAdapter.apply {
+                coinClickListener = CoinListAdapter.CoinClickListener { coin ->
                     navigateToDetailFragment(coin)
                 }
-            )
+            }
             itemAnimator = null
         }
+
     }
 
     private fun navigateToDetailFragment(coin: UiCoin) {
@@ -112,4 +129,5 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
     private fun updateRecyclerList(list: List<UiCoin>) {
         (binding.recyclerCoinList.adapter as CoinListAdapter).submitList(list)
     }
+
 }
