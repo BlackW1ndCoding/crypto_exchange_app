@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinFromSymbolsDbModel
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinToSymbolDbModel
 
 @Dao
 interface CoinDao {
@@ -25,4 +26,10 @@ interface CoinDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFromSymbols(fromSymbols: CoinFromSymbolsDbModel)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertToSymbol(toSymbol: CoinToSymbolDbModel)
+
+    @Query("SELECT * FROM to_symbol LIMIT 1")
+    fun getToSymbol(): Flow<CoinToSymbolDbModel>
 }

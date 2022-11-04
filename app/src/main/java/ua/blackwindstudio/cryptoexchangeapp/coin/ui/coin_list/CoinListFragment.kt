@@ -16,6 +16,7 @@ import ua.blackwindstudio.cryptoexchangeapp.appComponent
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_details.CoinDetailsFragment
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiToSymbol
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.utils.AutoClearedValue
 import ua.blackwindstudio.cryptoexchangeapp.databinding.FragmentCoinListBinding
 import javax.inject.Inject
@@ -43,6 +44,15 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         binding = FragmentCoinListBinding.bind(view)
         setupRecycler()
         setupSpinner()
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+
+            viewModel.toSymbol.collectLatest { toSymbol ->
+                binding.spinnerChooseCurrency.setSelection(
+                    toSymbol.ordinal
+                )
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.coinList.collectLatest { list ->
@@ -75,10 +85,11 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
 
     private fun setupSpinner() {
         binding.spinnerChooseCurrency.apply {
-            adapter = ArrayAdapter.createFromResource(
-                requireContext(), R.array.to_symbols,
-                R.layout.item_to_symbol
-            )
+            adapter = object: ArrayAdapter<UiToSymbol>(
+                requireContext(),
+                R.layout.item_to_symbol,
+                UiToSymbol.values()
+            ) {}
             onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     adapter: AdapterView<*>?,

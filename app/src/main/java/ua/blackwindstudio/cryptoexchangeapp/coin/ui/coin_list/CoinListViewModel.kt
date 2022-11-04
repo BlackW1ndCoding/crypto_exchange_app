@@ -13,6 +13,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.CoinRepository
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinDbModel
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.mappers.Mapper
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiToSymbol
 
 class CoinListViewModel @AssistedInject constructor(
     private val repository: CoinRepository,
@@ -22,11 +23,10 @@ class CoinListViewModel @AssistedInject constructor(
     private val _coinList = MutableStateFlow<List<UiCoin>>(emptyList())
     val coinList: StateFlow<List<UiCoin>> = _coinList
 
-    init {
-        viewModelScope.launch {
-            repository.updatePriceList("USD", 10000L)
-        }
+    private val _toSymbol = MutableStateFlow(UiToSymbol.USD)
+    val toSymbol = _toSymbol as StateFlow<UiToSymbol>
 
+    init {
         viewModelScope.launch {
             repository.getPriceList().collectLatest { list ->
                 Log.d("REPOSITORY", "Collecting in VM")
@@ -37,16 +37,20 @@ class CoinListViewModel @AssistedInject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            repository.getToSymbol().collectLatest { dbModel ->
+                _toSymbol.update {
+                    mapper.mapToSymbol(dbModel)
+                }
+            }
+        }
     }
 
     fun changeToSymbol(position: Int) {
         viewModelScope.launch {
-            repository.changeToSymbol(ToSymbol.values()[position].name)
+            repository.changeToSymbol(UiToSymbol.values()[position].name)
         }
-    }
-
-    enum class ToSymbol {
-        USD, EUR, UAH,
     }
 
     companion object {
