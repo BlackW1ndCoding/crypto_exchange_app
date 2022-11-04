@@ -31,5 +31,8 @@ interface CoinDao {
     suspend fun insertToSymbol(toSymbol: CoinToSymbolDbModel)
 
     @Query("SELECT * FROM to_symbol LIMIT 1")
-    fun getToSymbol(): Flow<CoinToSymbolDbModel>
+    fun getToSymbol(): CoinToSymbolDbModel
+
+    @Query("SELECT * FROM to_symbol LIMIT 1")
+    fun getToSymbolAsFlow(): Flow<CoinToSymbolDbModel>
 }

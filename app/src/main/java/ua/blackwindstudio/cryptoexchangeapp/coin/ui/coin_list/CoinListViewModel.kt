@@ -41,15 +41,19 @@ class CoinListViewModel @AssistedInject constructor(
         viewModelScope.launch {
             repository.getToSymbol().collectLatest { dbModel ->
                 _toSymbol.update {
-                    mapper.mapToSymbol(dbModel)
+                    try {
+                        mapper.mapToSymbol(dbModel)
+                    } catch (e: Exception) {
+                        UiToSymbol.USD
+                    }
                 }
             }
         }
     }
 
     fun changeToSymbol(position: Int) {
-        viewModelScope.launch {
-            repository.changeToSymbol(UiToSymbol.values()[position].name)
+        if (_toSymbol.value.ordinal != position) {
+                repository.changeToSymbol(UiToSymbol.values()[position].name)
         }
     }
 

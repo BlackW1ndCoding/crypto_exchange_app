@@ -11,7 +11,7 @@ interface CoinRepository {
 
     fun getToSymbol(): Flow<CoinToSymbolDbModel>
 
-    suspend fun changeToSymbol(toSymbol: String)
+    fun changeToSymbol(toSymbol: String)
 
     fun onAppDestroy()
 }

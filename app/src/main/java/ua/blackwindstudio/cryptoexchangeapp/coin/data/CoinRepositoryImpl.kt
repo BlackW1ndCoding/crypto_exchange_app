@@ -5,7 +5,6 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
@@ -22,21 +21,20 @@ class CoinRepositoryImpl @Inject constructor(
     private val workManager: WorkManager
 ): CoinRepository {
     private val repositoryScope = CoroutineScope(IO)
+    private val toSymbol
+        get() = try {
+            db.dao.getToSymbol().toSymbol
+        } catch (e: Exception) {
+            DEFAULT_TO_SYMBOL
+        }
 
     init {
         repositoryScope.launch {
-            db.dao.getToSymbol().collectLatest { dbModel ->
-                val toSymbol = try {
-                    dbModel.toSymbol
-                } catch (e: Exception) {
-                    DEFAULT_TO_SYMBOL
-                }
-                initializeRepository(toSymbol, DATA_LOAD_DELAY)
-            }
+            initializeRepository()
         }
     }
 
-    override fun getToSymbol() = db.dao.getToSymbol()
+    override fun getToSymbol() = db.dao.getToSymbolAsFlow()
 
     override fun getPriceList() =
         db.dao.getPriceList().mapLatest { list -> list.sortedBy { it.fromSymbol } }
@@ -44,27 +42,28 @@ class CoinRepositoryImpl @Inject constructor(
     override fun getCoinBySymbol(fromSymbol: String) =
         db.dao.getPriceBySymbols(fromSymbol)
 
-    override suspend fun changeToSymbol(toSymbol: String) {
-        db.dao.insertToSymbol(CoinToSymbolDbModel(toSymbol))
+    override fun changeToSymbol(toSymbol: String) {
+        repositoryScope.launch {
+            db.dao.insertToSymbol(CoinToSymbolDbModel(toSymbol))
+        }
         startPriceLoadingService(toSymbol, DATA_LOAD_DELAY)
     }
 
     override fun onAppDestroy() {
-        queueRefreshCoinPricesWork(toSymbol = "USD")
+
+        queueRefreshCoinPricesWork(toSymbol)
         priceLoadService.cancelCoinPriceLoading()
     }
 
-    private suspend fun initializeRepository(
-        toSymbol: String,
-        loadDelay: Long
-    ) {
+    private fun initializeRepository() {
         queueRefreshTopCoinsList()
         stopBackGroundPriceUpdate()
-        startPriceLoadingService(toSymbol, loadDelay)
+
+        changeToSymbol(toSymbol)
     }
 
-    private suspend fun startPriceLoadingService(toSymbol: String, loadDelay: Long) {
-        priceLoadService.startCoinPriceLoading(toSymbol, loadDelay)
+    private fun startPriceLoadingService(toSymbol: String, loadDelay: Long) {
+        repositoryScope.launch { priceLoadService.startCoinPriceLoading(toSymbol, loadDelay) }
     }
 
     private fun queueRefreshTopCoinsList() {
