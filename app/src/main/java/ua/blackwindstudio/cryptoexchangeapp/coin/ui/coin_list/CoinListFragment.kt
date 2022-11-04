@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.appComponent
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
+import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.ToSymbolSpinnerAdapter
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_details.CoinDetailsFragment
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiCoin
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.model.UiToSymbol
@@ -85,11 +85,11 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
 
     private fun setupSpinner() {
         binding.spinnerChooseCurrency.apply {
-            adapter = object: ArrayAdapter<UiToSymbol>(
+            adapter = ToSymbolSpinnerAdapter(
                 requireContext(),
                 R.layout.item_to_symbol,
                 UiToSymbol.values()
-            ) {}
+            )
             onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     adapter: AdapterView<*>?,

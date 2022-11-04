@@ -38,6 +38,22 @@ class CoinRepositoryImpl @Inject constructor(
 
     override fun getToSymbol() = db.dao.getToSymbol()
 
+    override fun getPriceList() =
+        db.dao.getPriceList().mapLatest { list -> list.sortedBy { it.fromSymbol } }
+
+    override fun getCoinBySymbol(fromSymbol: String) =
+        db.dao.getPriceBySymbols(fromSymbol)
+
+    override suspend fun changeToSymbol(toSymbol: String) {
+        db.dao.insertToSymbol(CoinToSymbolDbModel(toSymbol))
+        startPriceLoadingService(toSymbol, DATA_LOAD_DELAY)
+    }
+
+    override fun onAppDestroy() {
+        queueRefreshCoinPricesWork(toSymbol = "USD")
+        priceLoadService.cancelCoinPriceLoading()
+    }
+
     private suspend fun initializeRepository(
         toSymbol: String,
         loadDelay: Long
@@ -71,22 +87,6 @@ class CoinRepositoryImpl @Inject constructor(
 
     private fun stopBackGroundPriceUpdate() {
         workManager.cancelUniqueWork(RefreshCoinPricesDataWorker.NAME)
-    }
-
-    override fun getPriceList() =
-        db.dao.getPriceList().mapLatest { list -> list.sortedBy { it.fromSymbol } }
-
-    override fun getCoinBySymbol(fromSymbol: String) =
-        db.dao.getPriceBySymbols(fromSymbol)
-
-    override suspend fun changeToSymbol(toSymbol: String) {
-        db.dao.insertToSymbol(CoinToSymbolDbModel(toSymbol))
-        startPriceLoadingService(toSymbol, DATA_LOAD_DELAY)
-    }
-
-    override fun onAppDestroy() {
-        queueRefreshCoinPricesWork(toSymbol = "USD")
-        priceLoadService.cancelCoinPriceLoading()
     }
 
     companion object {
