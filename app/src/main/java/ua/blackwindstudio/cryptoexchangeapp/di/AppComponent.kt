@@ -13,6 +13,7 @@ import javax.inject.Singleton
 
 @Component(
     modules = [
+        RepositoryModule::class,
         CoinDBModule::class,
         NetworkModule::class,
         UIModule::class

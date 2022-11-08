@@ -13,9 +13,7 @@ import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinPriceUpdateSer
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshCoinPricesDataWorker
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshTopCoinsListWorker
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 @ExperimentalCoroutinesApi
 class CoinRepositoryImpl @Inject constructor(
     private val db: CoinDatabase,
