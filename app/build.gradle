@@ -44,7 +44,7 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.5.3'
 
     //dagger
-    implementation("com.google.dagger:dagger:$dagger_version")
+    implementation ("com.google.dagger:dagger:$dagger_version")
     kapt("com.google.dagger:dagger-compiler:$dagger_version")
 
     //navigation
