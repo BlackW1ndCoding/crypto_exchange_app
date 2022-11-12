@@ -8,10 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.cancel
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collectLatest
 import ua.blackwindstudio.cryptoexchangeapp.R
 import ua.blackwindstudio.cryptoexchangeapp.appComponent
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinError
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.CoinListAdapter
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.adapters.ToSymbolSpinnerAdapter
 import ua.blackwindstudio.cryptoexchangeapp.coin.ui.coin_details.CoinDetailsFragment
@@ -45,7 +47,15 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         setupRecycler()
         setupSpinner()
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+        launchCoroutine {
+            viewModel.errorsChannel.collectLatest { error ->
+                when (error) {
+                    is CoinError.RemoteError.IOError -> showSnackBar("You may have no internet connection.")
+                }
+            }
+        }
+
+        launchCoroutine {
 
             viewModel.toSymbol.collectLatest { toSymbol ->
                 binding.spinnerChooseCurrency.setSelection(
@@ -54,7 +64,7 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+        launchCoroutine {
             viewModel.coinList.collectLatest { list ->
                 updateRecyclerList(list)
             }
@@ -62,15 +72,19 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         if (!inPortraitMode()
             && binding.detailFragmentContainer!!.childCount == 0
         ) {
-            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            launchCoroutine {
                 viewModel.coinList.collectLatest { list ->
                     if (list.isNotEmpty()) {
                         initializeLandscapeMode(list.first())
-                        cancel()
+                        throw CancellationException()
                     }
                 }
             }
         }
+    }
+
+    private fun showSnackBar(text: String) {
+        Snackbar.make(requireView(), text, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun initializeLandscapeMode(coin: UiCoin) {
@@ -141,4 +155,9 @@ class CoinListFragment: Fragment(R.layout.fragment_coin_list) {
         (binding.recyclerCoinList.adapter as CoinListAdapter).submitList(list)
     }
 
+    private fun launchCoroutine(block: suspend () -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            block.invoke()
+        }
+    }
 }

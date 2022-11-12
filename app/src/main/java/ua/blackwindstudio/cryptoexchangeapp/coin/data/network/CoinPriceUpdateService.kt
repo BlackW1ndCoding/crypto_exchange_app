@@ -1,11 +1,10 @@
 package ua.blackwindstudio.cryptoexchangeapp.coin.data.network
 
 import android.util.Log
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.mapper.CoinMapper
 import java.util.concurrent.CancellationException
@@ -18,7 +17,12 @@ class CoinPriceUpdateService @Inject constructor(
 ) {
     private var job = Job()
 
-    suspend fun startCoinPriceLoading(toSymbol: String, loadDelay: Long) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _errorsChannel = MutableSharedFlow<CoinError.RemoteError>()
+    val errorsChannel: SharedFlow<CoinError.RemoteError> = _errorsChannel
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun startCoinPriceLoading(toSymbol: String, loadDelayMs: Long) {
 
         job.cancel()
         job = Job()
@@ -41,12 +45,15 @@ class CoinPriceUpdateService @Inject constructor(
                         ).map { mapper.mapDtoToDb(it) }
                     )
                 } catch (e: Exception) {
-                    Log.d(
-                        "RefreshCoinPricesDataWorker",
-                        "Could not update prices data with ${e.message}"
-                    )
+                    when (e) {
+                        is Exception -> _errorsChannel.emit(CoinError.RemoteError.IOError)
+                        else -> Log.d(
+                            "RefreshCoinPricesDataWorker",
+                            "Could not update prices data with ${e.message}"
+                        )
+                    }
                 }
-                delay(loadDelay)
+                delay(loadDelayMs)
             }
         }
     }

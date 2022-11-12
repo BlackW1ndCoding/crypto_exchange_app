@@ -5,10 +5,14 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.CoinDatabase
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.db.model.CoinToSymbolDbModel
+import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinError
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.CoinPriceUpdateService
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshCoinPricesDataWorker
 import ua.blackwindstudio.cryptoexchangeapp.coin.data.network.workers.RefreshTopCoinsListWorker
@@ -27,10 +31,18 @@ class CoinRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             DEFAULT_TO_SYMBOL
         }
+    private val _errorsChannel = MutableSharedFlow<CoinError>()
+    override val errorsChannel: SharedFlow<CoinError> = _errorsChannel
 
     init {
         repositoryScope.launch {
             initializeRepository()
+        }
+
+        repositoryScope.launch {
+            priceLoadService.errorsChannel.collectLatest {
+                _errorsChannel.emit(it)
+            }
         }
     }
 
@@ -94,5 +106,4 @@ class CoinRepositoryImpl @Inject constructor(
 
         private const val DEFAULT_TO_SYMBOL = "USD"
     }
-
 }
