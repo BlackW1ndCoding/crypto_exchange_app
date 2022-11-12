@@ -26,6 +26,9 @@ class CoinListViewModel @AssistedInject constructor(
     private val _toSymbol = MutableStateFlow(UiToSymbol.USD)
     val toSymbol = _toSymbol as StateFlow<UiToSymbol>
 
+
+    val errorsChannel = repository.errorsChannel
+
     init {
         viewModelScope.launch {
             repository.getPriceList().collectLatest { list ->
@@ -53,7 +56,7 @@ class CoinListViewModel @AssistedInject constructor(
 
     fun changeToSymbol(position: Int) {
         if (_toSymbol.value.ordinal != position) {
-                repository.changeToSymbol(UiToSymbol.values()[position].name)
+            repository.changeToSymbol(UiToSymbol.values()[position].name)
         }
     }
 
